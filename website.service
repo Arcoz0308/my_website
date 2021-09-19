@@ -1,0 +1,14 @@
+# this file are my own configuration
+[Unit]
+Description=my website
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=10
+User=root
+WorkingDirectory=/home/website/
+ExecStart=/home/website/arcoz0308.tech
+StandardOutput=file:/home/website/log.log
+StandardError=file:/home/website/log.log
