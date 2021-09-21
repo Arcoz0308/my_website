@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/arcoz0308/arcoz0308.tech/api/discord"
 	"github.com/arcoz0308/arcoz0308.tech/api/minecraft"
+	"github.com/arcoz0308/arcoz0308.tech/middlewares"
 	"github.com/gorilla/mux"
 )
 
@@ -13,5 +14,7 @@ func Init() *mux.Router {
 	api.HandleFunc("/minecraft/{server}", minecraft.Query)
 	api.HandleFunc("/mcbe/{server}", minecraft.QueryMCBE)
 	api.HandleFunc("/mcpe/{server}", minecraft.QueryMCBE)
+	api.Use(middlewares.LogAPIRequest)
+	api.Use(middlewares.CheckGlobalAPIRateLimit)
 	return api
 }

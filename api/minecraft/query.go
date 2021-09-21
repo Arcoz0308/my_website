@@ -15,7 +15,6 @@ func Query(w http.ResponseWriter, r *http.Request) {
 	if len(strings.Split(serv, ":")) == 1 {
 		serv = serv + ":25565"
 	}
-	w.Header().Set("Content-Type", "application/json")
 	infos, err := query.Do(serv)
 	if err != nil {
 		w.WriteHeader(500)

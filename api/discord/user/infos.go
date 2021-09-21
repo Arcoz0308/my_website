@@ -12,8 +12,6 @@ import (
 func Info(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	client := &http.Client{}
-
-	w.Header().Set("Content-Type", "application/json")
 	req, err := http.NewRequest("GET", "https://discord.com/api/v9/users/"+id, nil)
 	if err != nil {
 		w.WriteHeader(500)
