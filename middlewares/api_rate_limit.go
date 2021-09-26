@@ -31,7 +31,7 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 				rl.Number = 1
 				rl.Reset = time.Now().Add(time.Minute)
 			} else if rl.Number < globalLimit {
-				rl.Number = rl.Number + 1
+				rl.Number++
 			} else {
 				// user are global rate limit
 				log.Printf("address %s are global ratelimit for %f seconds", ip, time.Until(rl.Reset).Seconds())
@@ -75,4 +75,11 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+func ClearRateLimitCache() {
+	for ip, i := range global {
+		if i.Reset.Before(time.Now()) {
+			delete(global, ip)
+		}
+	}
 }

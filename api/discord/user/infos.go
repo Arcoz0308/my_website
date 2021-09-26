@@ -9,6 +9,12 @@ import (
 	"net/http"
 )
 
+/**
+@api {GET} /discord/users/:id discord user info
+@apiDescription get infos about a discord user without a discord token
+
+*/
+
 func Info(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	client := &http.Client{}

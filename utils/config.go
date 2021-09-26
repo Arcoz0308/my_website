@@ -8,10 +8,14 @@ import (
 var Config config
 
 type config struct {
-	Discord discordConfig
+	Discord  discordConfig
+	Database databaseConfig
 }
 type discordConfig struct {
 	Token string
+}
+type databaseConfig struct {
+	Url string
 }
 
 func LoadConfig() {
