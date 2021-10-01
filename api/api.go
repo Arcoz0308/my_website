@@ -18,8 +18,6 @@ func Init() *mux.Router {
 	})
 	api := mux.NewRouter()
 	discord.Init(api.PathPrefix("/discord").Subrouter())
-	api.HandleFunc("/mc/{server}", minecraft.Query).Methods("GET")
-	api.HandleFunc("/minecraft/{server}", minecraft.Query).Methods("GET")
 	api.HandleFunc("/mcbe/{server}", minecraft.QueryMCBE).Methods("GET")
 	api.HandleFunc("/mcpe/{server}", minecraft.QueryMCBE).Methods("GET")
 	api.HandleFunc("/arcpaste/{key}", arcpaste.GetPaste).Methods("GET")

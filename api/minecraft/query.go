@@ -18,7 +18,7 @@ type serverInfos struct {
 	Time  time.Time
 }
 
-func Query(w http.ResponseWriter, r *http.Request) {
+/* func Query(w http.ResponseWriter, r *http.Request) {
 	serv := mux.Vars(r)["server"]
 	if len(strings.Split(serv, ":")) == 1 {
 		serv = serv + ":25565"
@@ -44,6 +44,8 @@ func Query(w http.ResponseWriter, r *http.Request) {
 	j, _ := json.Marshal(infos)
 	io.WriteString(w, string(j))
 }
+*/
+
 func QueryMCBE(w http.ResponseWriter, r *http.Request) {
 	serv := mux.Vars(r)["server"]
 	if len(strings.Split(serv, ":")) == 1 {
