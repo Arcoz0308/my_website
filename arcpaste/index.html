@@ -9,17 +9,19 @@
 <body>
     <div class="nav-bar">
         <lu>
-            <li style="float: left"><a class="page-title" >ARCPASTE</a></li>
-            <li><a class="button">github</a></li>
+            <li style="float: left"><a class="page-title" href="/about">ARCPASTE</a></li>
+            <li><a class="button" href="https://github.com/Arcoz0308/arcoz0308.tech">github</a></li>
             <li><a class="button" id="raw-button">raw</a> </li>
-            <li><a class="button">new</a></li>
+            <li><a class="button" href="/new">new</a></li>
         </lu>
     </div>
     <div class="lines" id="lines">
-        <p>1</p>
+        >
     </div>
-    <div class="text-zone">
-        <pre><code class="language-javascript" id="code-zone"></code></pre>
+    <pre><code class="language-javascript" id="code-zone"></code></pre>
+    <textarea id="textarea" style="display: none" autofocus="true" autocapitalize="none" autocomplete="off" spellcheck="false"></textarea>
+    <div id="options" style="display: none">
+        <button id="save">save</button>
     </div>
     <script type="text/javascript" src="asset/prism.min.js"></script>
     <script type="text/javascript" src="asset/main.min.js"></script>

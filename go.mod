@@ -4,13 +4,14 @@ go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
-	github.com/go-co-op/gocron v1.9.0 // indirect
+	github.com/go-co-op/gocron v1.3.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/muhammadmuzzammil1998/jsonc v0.0.0-20201229145248-615b0916ca38 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sandertv/go-raknet v1.10.0 // indirect
 	github.com/sandertv/gophertunnel v1.14.3 // indirect
 	go.mongodb.org/mongo-driver v1.7.2 // indirect

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"log"
+	"github.com/arcoz0308/arcoz0308.tech/utils/logger"
 	"net/http"
 	"strconv"
 	"strings"
@@ -32,6 +32,7 @@ func (rw *statusWriter) WriteHeader(statusCode int) {
 }
 func LogAPIRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		start := time.Now()
 		sw := statusWriter{ResponseWriter: w}
 		w.Header().Set("Content-Type", "application/json")
@@ -53,6 +54,6 @@ func LogAPIRequest(next http.Handler) http.Handler {
 			strconv.Itoa(int(sw.Length)) + "B",
 			strconv.Itoa(int(latency)) + "ms",
 		}
-		log.Print(strings.Join(msg, " "))
+		logger.RequestLog(strings.Join(msg, " "))
 	})
 }

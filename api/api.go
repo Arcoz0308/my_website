@@ -5,17 +5,18 @@ import (
 	"github.com/arcoz0308/arcoz0308.tech/api/discord"
 	"github.com/arcoz0308/arcoz0308.tech/api/minecraft"
 	"github.com/arcoz0308/arcoz0308.tech/middlewares"
-	"github.com/go-co-op/gocron"
+	"github.com/arcoz0308/arcoz0308.tech/utils"
 	"github.com/gorilla/mux"
-	"time"
 )
 
 func Init() *mux.Router {
-	task := gocron.NewScheduler(time.UTC)
-	task.Every(5).Minutes().Do(func() {
+	_, err := utils.Cron.AddFunc("* */5 * * * *", func() {
 		minecraft.ClearCache()
 		middlewares.ClearRateLimitCache()
 	})
+	if err != nil {
+		panic(err)
+	}
 	api := mux.NewRouter()
 	discord.Init(api.PathPrefix("/discord").Subrouter())
 	api.HandleFunc("/mcbe/{server}", minecraft.QueryMCBE).Methods("GET")

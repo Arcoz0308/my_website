@@ -1,2 +1,4 @@
 config.toml
 .idea/
+request_logs/
+rate_limit_logs/
