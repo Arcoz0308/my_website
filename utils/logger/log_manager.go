@@ -14,6 +14,7 @@ import (
 
 var (
 	maxLines        = 10000
+	requestLogLines int
 	requestLogFile  *os.File
 	awaitRequestLog []string
 )
@@ -28,9 +29,12 @@ func Init() {
 	loadRequestLogger()
 	_, err := utils.Cron.AddFunc("0 * * * * *", func() {
 		if len(awaitRequestLog) != 0 {
-			checkRequestFile()
 			requestLogFile.WriteString(strings.Join(awaitRequestLog, "\n") + "\n")
+			requestLogLines += len(awaitRequestLog)
 			awaitRequestLog = []string{}
+			if requestLogLines >= maxLines {
+				loadRequestLogger()
+			}
 		}
 	})
 	if err != nil {
@@ -43,27 +47,11 @@ func Init() {
 		panic(err)
 	}
 }
-func checkRequestFile() {
-	// if someone has one solution for do this without reopen contact me please
-	n := requestLogFile.Name()
-	err := requestLogFile.Close()
-	if err != nil {
-		panic(err)
-	}
-	requestLogFile, err = os.OpenFile(n, os.O_APPEND, 0644)
-	if err != nil {
-		panic(err)
-	}
-	l, err := LineCounter(requestLogFile)
-	if err != nil {
-		panic(err)
-	}
-	if l >= maxLines {
-		loadRequestLogger()
-	}
 
-}
 func loadRequestLogger() {
+	if requestLogFile != nil {
+		requestLogFile.Close()
+	}
 	var f *os.File
 	// format YYYY-MM-DD-n.log
 	files, err := os.ReadDir("request_logs")
@@ -116,6 +104,11 @@ func loadRequestLogger() {
 	if err != nil {
 		panic(err)
 	}
+	l, err := LineCounter(file)
+	if err != nil {
+		panic(err)
+	}
+	requestLogLines = l
 	requestLogFile = file
 }
 func RequestLog(msg string) {
