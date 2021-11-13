@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+  <div>
+      {{ if .Message}}
+        <p role="alert">{{.Message}}</p>
+      {{end}}
+  <form action="/login{{if .CustomRedirect}} ?redirect={{.CustomRedirect}} {{end}}" method="post">
+    <label for="mail-username">Email/Username</label>
+    <input type="text" id="mail-username" name="name" {{if .Name}} value="{{.Name}}" {{end}}>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+    <button type="submit">login</button>
+  </form>
+  </div>
+
+</body>
+</html>

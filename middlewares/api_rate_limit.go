@@ -7,12 +7,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
 var global = map[string]*rateLimit{}
 
-var globalLimit = 120 // number of request max for each minute
+var globalLimit = 300 // number of request max for each minute
 
 type rateLimit struct {
 	Number int       // number of request already made
@@ -25,6 +26,8 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 		if ip == "" {
 			ip = r.RemoteAddr
 		}
+		m := &sync.Mutex{}
+		m.Lock()
 		if rl, ok := global[ip]; ok {
 			if rl.Reset.Before(time.Now()) {
 				log.Printf("nul")
@@ -33,6 +36,7 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 			} else if rl.Number < globalLimit {
 				rl.Number++
 			} else {
+				rl.Number++
 				// user are global rate limit
 				log.Printf("address %s are global ratelimit for %f seconds", ip, time.Until(rl.Reset).Seconds())
 				w.Header().Set("X-RateLimit-Global", "true")
@@ -62,11 +66,12 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 		} else {
 			global[ip] = &rateLimit{
 				Number: 1,
-
-				Reset: time.Now().Add(time.Minute),
+				Reset:  time.Now().Add(time.Minute),
 			}
 		}
+		m.Unlock()
 		rl := global[ip]
+
 		// set headers
 		w.Header().Set("X-RateLimit-Limit", strconv.Itoa(globalLimit))
 		w.Header().Set("X-RateLimit-Remaining", strconv.Itoa(globalLimit-rl.Number))
@@ -77,9 +82,12 @@ func CheckGlobalAPIRateLimit(next http.Handler) http.Handler {
 	})
 }
 func ClearRateLimitCache() {
+	m := &sync.Mutex{}
+	m.Lock()
 	for ip, i := range global {
 		if i.Reset.Before(time.Now()) {
 			delete(global, ip)
 		}
 	}
+	m.Unlock()
 }

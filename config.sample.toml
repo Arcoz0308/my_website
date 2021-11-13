@@ -1,3 +1,7 @@
 [discord]
 # a discord bot token
 token = "your token"
+
+[database]
+# the url to your mongodb
+url = "mongodb://ip"

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"fmt"
@@ -42,6 +43,7 @@ func Init() {
 	}
 	_, err = utils.Cron.AddFunc("@daily", func() {
 		loadRequestLogger()
+		zipLog()
 	})
 	if err != nil {
 		panic(err)
@@ -100,11 +102,16 @@ func loadRequestLogger() {
 	name := f.Name()
 	f.Close()
 
-	file, err := os.OpenFile(name, os.O_APPEND, 0644)
+	file, err := os.OpenFile(name, os.O_RDONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
 	l, err := LineCounter(file)
+	if err != nil {
+		panic(err)
+	}
+	file.Close()
+	file, err = os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -143,4 +150,44 @@ func LineCounter(r io.Reader) (int, error) {
 	}
 
 	return count, nil
+}
+func zipLog() {
+	d := time.Now().AddDate(0, 0, -1)
+	archive, err := os.Create(fmt.Sprintf("request_logs/%s.zip", d.Format("2006-01-02")))
+	if err != nil {
+		panic(err)
+	}
+	defer archive.Close()
+	files, err := os.ReadDir("request_logs")
+	if err != nil {
+		panic(err)
+	}
+	var filesToZip []os.DirEntry
+	pattern := fmt.Sprintf("%s-[0-9]+\\.log", d.Format("2006-01-02"))
+	r, err := regexp.Compile(pattern)
+	if err != nil {
+		panic(err)
+	}
+	for _, file := range files {
+		match := r.MatchString(file.Name())
+		if match {
+			filesToZip = append(filesToZip, file)
+		}
+	}
+	zipWriter := zip.NewWriter(archive)
+	for _, file := range filesToZip {
+		reader, err := os.Open("request_logs/" + file.Name())
+		if err != nil {
+			panic(err)
+		}
+		writer, err := zipWriter.Create(file.Name())
+		if err != nil {
+			panic(err)
+		}
+		_, err = io.Copy(writer, reader)
+		if err != nil {
+			panic(err)
+		}
+	}
+	zipWriter.Close()
 }

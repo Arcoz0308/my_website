@@ -18,7 +18,7 @@ type serverInfos struct {
 	Time  time.Time
 }
 
-/* func Query(w http.ResponseWriter, r *http.Request) {
+func Query(w http.ResponseWriter, r *http.Request) {
 	serv := mux.Vars(r)["server"]
 	if len(strings.Split(serv, ":")) == 1 {
 		serv = serv + ":25565"
@@ -30,21 +30,7 @@ type serverInfos struct {
 			return
 		}
 	}
-
-	infos, err := query.Do(serv)
-	cache[serv] = serverInfos{
-		infos,
-		time.Now().Add(time.Second * 20),
-	}
-	if err != nil {
-		w.WriteHeader(500)
-		io.WriteString(w, fmt.Sprintf("{\"error\":\"%s\"}", err.Error()))
-		return
-	}
-	j, _ := json.Marshal(infos)
-	io.WriteString(w, string(j))
 }
-*/
 
 func QueryMCBE(w http.ResponseWriter, r *http.Request) {
 	serv := mux.Vars(r)["server"]
@@ -53,7 +39,7 @@ func QueryMCBE(w http.ResponseWriter, r *http.Request) {
 	}
 	if i, ok := cache[serv]; ok {
 		if !i.Time.Before(time.Now()) {
-			j, _ := json.Marshal(i)
+			j, _ := json.Marshal(i.Infos)
 			io.WriteString(w, string(j))
 			return
 		}
@@ -62,7 +48,7 @@ func QueryMCBE(w http.ResponseWriter, r *http.Request) {
 	infos, err := query.Do(serv)
 	cache[serv] = serverInfos{
 		infos,
-		time.Now().Add(time.Second * 20),
+		time.Now().Add(time.Second * 5),
 	}
 	if err != nil {
 		w.WriteHeader(500)

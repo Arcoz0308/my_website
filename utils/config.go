@@ -15,7 +15,7 @@ type discordConfig struct {
 	Token string
 }
 type databaseConfig struct {
-	Url string
+	Dsn string
 }
 
 func LoadConfig() {
