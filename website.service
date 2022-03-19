@@ -12,3 +12,5 @@ WorkingDirectory=/home/website/
 ExecStart=/home/website/arcoz0308.tech
 StandardOutput=file:/home/website/log.log
 StandardError=file:/home/website/log.log
+[Install]
+WantedBy=multi-user.target

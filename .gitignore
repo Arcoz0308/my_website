@@ -1,5 +1,4 @@
 config.toml
-authentication/encode_password.go
 authentication/crypt/
 rate_limit_logs/
 request_logs/

@@ -18,12 +18,12 @@ func Init() *mux.Router {
 		panic(err)
 	}
 	api := mux.NewRouter()
+	api.Use(middlewares.LogAPIRequest)
+	api.Use(middlewares.CheckGlobalAPIRateLimit)
 	discord.Init(api.PathPrefix("/discord").Subrouter())
 	api.HandleFunc("/mcbe/{server}", minecraft.QueryMCBE).Methods("GET")
 	api.HandleFunc("/mcpe/{server}", minecraft.QueryMCBE).Methods("GET")
 	api.HandleFunc("/arcpaste/{key}", arcpaste.GetPaste).Methods("GET")
 	api.HandleFunc("/arcpaste", arcpaste.PostPaste).Methods("POST").Headers("Content-Type", "application/json")
-	api.Use(middlewares.LogAPIRequest)
-	api.Use(middlewares.CheckGlobalAPIRateLimit)
 	return api
 }

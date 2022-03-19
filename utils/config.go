@@ -8,14 +8,22 @@ import (
 var Config config
 
 type config struct {
-	Discord  discordConfig
-	Database databaseConfig
-}
-type discordConfig struct {
-	Token string
-}
-type databaseConfig struct {
-	Dsn string
+	Database struct {
+		Dsn string `json:"dsn"`
+	} `json:"database"`
+	Discord struct {
+		Token string `json:"token"`
+	} `json:"discord"`
+	Host struct {
+		Api struct {
+			Host      string `json:"host"`
+			Localport int    `json:"localport"`
+		} `json:"api"`
+		Arcpaste struct {
+			Host      string `json:"host"`
+			Localport int    `json:"localport"`
+		} `json:"arcpaste"`
+	} `json:"host"`
 }
 
 func LoadConfig() {

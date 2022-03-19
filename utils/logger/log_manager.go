@@ -111,6 +111,7 @@ func loadRequestLogger() {
 		panic(err)
 	}
 	file.Close()
+
 	file, err = os.OpenFile(name, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
@@ -157,7 +158,9 @@ func zipLog() {
 	if err != nil {
 		panic(err)
 	}
+
 	defer archive.Close()
+
 	files, err := os.ReadDir("request_logs")
 	if err != nil {
 		panic(err)
@@ -168,12 +171,14 @@ func zipLog() {
 	if err != nil {
 		panic(err)
 	}
+
 	for _, file := range files {
 		match := r.MatchString(file.Name())
 		if match {
 			filesToZip = append(filesToZip, file)
 		}
 	}
+
 	zipWriter := zip.NewWriter(archive)
 	for _, file := range filesToZip {
 		reader, err := os.Open("request_logs/" + file.Name())
