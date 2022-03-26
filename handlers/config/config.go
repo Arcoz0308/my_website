@@ -1,6 +1,11 @@
 package config
 
-import "github.com/BurntSushi/toml"
+import (
+	"github.com/BurntSushi/toml"
+	"github.com/arcoz0308/arcoz0308.tech/handlers/logger"
+	"github.com/arcoz0308/arcoz0308.tech/utils"
+	"time"
+)
 
 var (
 	Cert     *cert
@@ -44,7 +49,8 @@ type global struct {
 	Host string `json:"host"`
 }
 
-func init() {
+func Init() {
+	t := time.Now()
 	var c config
 	_, err := toml.DecodeFile("config.toml", &c)
 	if err != nil {
@@ -55,4 +61,5 @@ func init() {
 	Redis = &c.Redis
 	Discord = &c.Discord
 	Global = &c.Global
+	logger.Infof("loaded config in %s", utils.MsWith2Decimal(time.Since(t)))
 }

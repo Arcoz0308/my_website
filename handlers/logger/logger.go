@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"github.com/arcoz0308/arcoz0308.tech/utils"
 	"github.com/jwalton/gchalk"
 	"io"
 	"os"
@@ -11,7 +12,7 @@ import (
 var (
 	output      io.Writer = os.Stdout
 	cyan                  = gchalk.Ansi256(14) // if possible, same cyan in each terminal
-	fatalLevel            = gchalk.WithBgAnsi(88).White
+	fatalLevel            = gchalk.BgAnsi256(88)
 	fatalText             = gchalk.Ansi256(124)
 	errorLevel            = gchalk.Ansi256(160)
 	errorText             = gchalk.Ansi256(196)
@@ -131,18 +132,18 @@ func Fatalln(exit bool, a ...any) {
 func AppFatal(exit bool, appName string, a ...any) {
 	fmt.Fprintf(output, "%s %s %s %s\n", cyan(time.Now().Format("[2006-01-02 15:04:05]")), app("["+appName+"]"), fatalLevel("[FATAL]"), fatalText(fmt.Sprint(a...)))
 	if exit {
-		os.Exit(1)
+		utils.CloseServ()
 	}
 }
 func AppFatalf(exit bool, appName string, format string, a ...any) {
 	fmt.Fprintf(output, "%s %s %s %s\n", cyan(time.Now().Format("[2006-01-02 15:04:05]")), app("["+appName+"]"), fatalLevel("[FATAL]"), fatalText(fmt.Sprintf(format, a...)))
 	if exit {
-		os.Exit(1)
+		utils.CloseServ()
 	}
 }
 func AppFatalln(exit bool, appName string, a ...any) {
 	fmt.Fprintf(output, "%s %s %s %s", cyan(time.Now().Format("[2006-01-02 15:04:05]")), app("["+appName+"]"), fatalLevel("[FATAL]"), fatalText(fmt.Sprintln(a...)))
 	if exit {
-		os.Exit(1)
+		utils.CloseServ()
 	}
 }

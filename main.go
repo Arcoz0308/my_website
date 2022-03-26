@@ -5,6 +5,8 @@ import (
 	"github.com/arcoz0308/arcoz0308.tech/handlers/config"
 	"github.com/arcoz0308/arcoz0308.tech/handlers/database"
 	"github.com/arcoz0308/arcoz0308.tech/handlers/logger"
+	"github.com/arcoz0308/arcoz0308.tech/handlers/logger/console"
+	"github.com/arcoz0308/arcoz0308.tech/handlers/redis"
 	"github.com/arcoz0308/arcoz0308.tech/routes"
 	"github.com/arcoz0308/arcoz0308.tech/utils"
 	"github.com/gofiber/fiber/v2"
@@ -13,9 +15,11 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync"
+	"time"
 )
 
-var Ips map[string]string
+var Ips = map[string]string{}
 
 func init() {
 	if os.Getenv("PROD") == "true" {
@@ -31,6 +35,13 @@ func main() {
 		logger.Noticeln("working in development mode")
 	}
 
+	// init the config
+	config.Init()
+
+	go func() {
+		console.LoadConsole()
+	}()
+
 	//get all local ips
 	ips, err := net.InterfaceAddrs()
 	if err != nil {
@@ -39,18 +50,59 @@ func main() {
 	for _, ip := range ips {
 		Ips[ip.String()] = ip.String()
 	}
-	logger.Infof("detected %d ip address", len(Ips))
+	logger.Noticef("detected %d local address", len(Ips))
 
-	// connect to database
-	database.Connect()
+	wg := sync.WaitGroup{}
+	wg.Add(2)
 
-	// load database prepares of different services
-	database.PreparesArcpaste()
+	go func() {
+		logger.Infoln("connecting to database...")
+		t := time.Now()
+		// connect to database
+		database.Connect()
+		logger.Infof("connected to database with success in %s", utils.MsWith2Decimal(time.Since(t)))
 
+		// check ping
+		ping, err := database.Ping()
+		if err != nil {
+			logger.Fatalf(true, "failed to ping database, error : %s", err.Error())
+		}
+		if ping.Milliseconds() > 100 {
+			logger.Warnf("big latency with database detected ( %s ), performance can by are reduce", utils.MsWith2Decimal(ping))
+		} else {
+			logger.Noticef("pinging database with success, result : %s", utils.MsWith2Decimal(ping))
+		}
+		// load database prepares of different services
+		database.PreparesArcpaste()
+
+		wg.Done()
+	}()
+
+	go func() {
+		logger.Infoln("connecting to redis...")
+		t := time.Now()
+		// connect to redis
+		redis.Connect()
+		logger.Infof("connected to redis with success in %s", utils.MsWith2Decimal(time.Since(t)))
+
+		// check ping
+		ping, err := redis.Ping()
+		if err != nil {
+			logger.Fatalf(true, "failed to ping redis, error : %s", err.Error())
+		}
+		if ping.Milliseconds() > 30 {
+			logger.Warnf("big latency with redis detected ( %s ), performance can by are reduce", utils.MsWith2Decimal(ping))
+		} else {
+			logger.Noticef("pinging redis with success, result : %s", utils.MsWith2Decimal(ping))
+		}
+
+		wg.Done()
+	}()
+	wg.Wait()
 	utils.LoadCron()
 	utils.StartCron()
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
 	// redirect to secure
 	if utils.Prod {
@@ -101,20 +153,9 @@ func main() {
 	if utils.Prod {
 		port = ":80"
 	}
-	log.Fatal(app.Listen(port))
-
-}
-
-// GetOutboundIP Get preferred outbound ip of this machine code from
-// https://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go
-func GetOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+	con, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(true, err)
 	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	return localAddr.IP
+	log.Fatal(app.Listener(con))
 }
