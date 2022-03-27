@@ -11,15 +11,13 @@ import (
 	"github.com/arcoz0308/arcoz0308.tech/utils"
 	"github.com/gofiber/fiber/v2"
 	utils2 "github.com/gofiber/fiber/v2/utils"
-	"golang.org/x/crypto/acme/autocert"
 	"log"
 	"net"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
-
-var Ips = map[string]string{}
 
 func init() {
 	if os.Getenv("PROD") == "true" {
@@ -41,16 +39,6 @@ func main() {
 	go func() {
 		console.LoadConsole()
 	}()
-
-	//get all local ips
-	ips, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
-	for _, ip := range ips {
-		Ips[ip.String()] = ip.String()
-	}
-	logger.Noticef("detected %d local address", len(Ips))
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
@@ -112,9 +100,8 @@ func main() {
 			if ctx.Secure() {
 				return ctx.Next()
 			}
-
-			_, ok := Ips[hostname]
-			if ok {
+			ok := strings.HasSuffix(strings.ToLower(hostname), config.Global.Host)
+			if !ok {
 				ctx.Locals("host_is_ip", true)
 				return ctx.Next()
 			}
@@ -130,17 +117,16 @@ func main() {
 	// load certs
 	if utils.Prod {
 		go func() {
-			m := autocert.Manager{
-				Prompt:     autocert.AcceptTOS,
-				Cache:      autocert.DirCache(config.Cert.Dir),
-				HostPolicy: autocert.HostWhitelist(config.Cert.Addrs...),
-				Email:      config.Cert.Email,
-			}
+			var err error
 			cfg := &tls.Config{
-				GetCertificate: m.GetCertificate,
 				NextProtos: []string{
 					"http/1.1", "acme-tls/1",
 				},
+			}
+			cfg.Certificates = make([]tls.Certificate, 1)
+			cfg.Certificates[0], err = tls.LoadX509KeyPair(config.Cert.CertFile, config.Cert.Key)
+			if err != nil {
+				logger.Fatalf(true, "error with ssl certificate, error : %s", err.Error())
 			}
 			con, err := tls.Listen("tcp", ":443", cfg)
 			if err != nil {

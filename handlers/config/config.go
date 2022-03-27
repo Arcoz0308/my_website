@@ -16,37 +16,36 @@ var (
 )
 
 type config struct {
-	Cert     cert     `json:"cert"`
-	Database database `json:"database"`
-	Redis    redis    `json:"redis"`
-	Discord  discord  `json:"discord"`
-	Global   global   `json:"global"`
+	Cert     cert     `toml:"cert"`
+	Database database `toml:"database"`
+	Redis    redis    `toml:"redis"`
+	Discord  discord  `toml:"discord"`
+	Global   global   `toml:"global"`
 }
 
 type cert struct {
-	Addrs []string `json:"addrs"`
-	Dir   string   `json:"dir"`
-	Email string   `json:"email"`
+	CertFile string `toml:"cert_file"`
+	Key      string `toml:"key"`
 }
 
 type database struct {
-	Addr   string `json:"addr"`
-	DbName string `json:"db_name"`
-	Passwd string `json:"passwd"`
-	User   string `json:"user"`
+	Addr   string `toml:"addr"`
+	DbName string `toml:"db_name"`
+	Passwd string `toml:"passwd"`
+	User   string `toml:"user"`
 }
 
 type redis struct {
-	Addr   string `json:"addr"`
-	User   string `json:"user"`
-	Passwd string `json:"passwd"`
+	Addr   string `toml:"addr"`
+	User   string `toml:"user"`
+	Passwd string `toml:"passwd"`
 }
 
 type discord struct {
-	Token []string `json:"token"`
+	Token []string `toml:"token"`
 }
 type global struct {
-	Host string `json:"host"`
+	Host string `toml:"host"`
 }
 
 func Init() {

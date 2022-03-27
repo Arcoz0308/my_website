@@ -1,0 +1,19 @@
+version: "3"
+
+tasks:
+  build-linux:
+    cmds:
+      - go build -o bin/arcoz.dev-linux-amd64 main.go
+    env:
+      GOOS: linux
+      GOARCH: amd64
+  build-windows:
+    cmds:
+      - go build -o bin/arcoz.dev-windows-amd64.exe main.go
+    env:
+      GOOS: windows
+      GOARCH: amd64
+  build:
+    cmds:
+      - task: build-linux
+      - task: build-windows
