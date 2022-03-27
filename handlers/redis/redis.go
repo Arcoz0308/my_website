@@ -10,6 +10,10 @@ import (
 
 var Client *redis.Client
 
+var (
+	PrefixLongCookieToken = "a"
+)
+
 func Connect() {
 	Client = redis.NewClient(&redis.Options{
 		Addr:     config.Redis.Addr,

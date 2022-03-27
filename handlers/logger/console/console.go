@@ -24,7 +24,7 @@ func LoadConsole() {
 		if cmd, ok := Commands[command]; ok {
 			cmd.Run(args)
 		} else {
-			logger.AppErrorf("command", "unknown command \"%s\"", command)
+			logger.AppErrorf("command:unknown", "unknown command \"%s\"", command)
 		}
 	}
 }

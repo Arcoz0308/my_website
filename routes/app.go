@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/arcoz0308/arcoz0308.tech/handlers/config"
-	v1 "github.com/arcoz0308/arcoz0308.tech/routes/api/v1"
+	"github.com/arcoz0308/arcoz0308.tech/routes/api"
 	"github.com/arcoz0308/arcoz0308.tech/utils"
 	"github.com/gofiber/fiber/v2"
 	"strings"
@@ -13,7 +13,7 @@ func LoadRoutes() func(ctx *fiber.Ctx) error {
 
 	// api router
 	apiRouter := fiber.New(fiber.Config{AppName: "api"})
-	v1.Route(apiRouter.Group("/"))
+	api.Route(apiRouter.Group("/"))
 	hosts["api"] = apiRouter
 
 	// arcpaste router
@@ -36,6 +36,9 @@ func LoadRoutes() func(ctx *fiber.Ctx) error {
 			}
 			paths := strings.SplitN(path, "/", 3)
 			if host, ok := hosts[paths[1]]; ok {
+				if len(paths) == 2 {
+					paths[2] = ""
+				}
 				ctx.Path("/" + paths[2])
 				host.Handler()(ctx.Context())
 				return nil
