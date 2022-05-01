@@ -90,6 +90,7 @@ func main() {
 	utils.LoadCron()
 	utils.StartCron()
 
+	routes.Load()
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
 	// redirect to secure
