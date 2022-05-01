@@ -16,8 +16,8 @@ func (*Uptime) Run(args []string) {
 func durationToString(d time.Duration) string {
 	days := int(d.Hours()) / 24
 	hours := int(d.Hours()) - (days * 24)
-	minutes := int(d.Minutes()) - (days * 24) - (hours * 60)
-	seconds := int(d.Seconds()) - (days * 24) - (hours * 60) - (minutes * 60)
+	minutes := int(d.Minutes()) - (days * 24 * 60) - (hours * 60)
+	seconds := int(d.Seconds()) - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60)
 	s := ""
 	if seconds > 0 {
 		s = strconv.Itoa(seconds) + "s" + s
